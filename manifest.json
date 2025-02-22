@@ -7,7 +7,7 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "description": "A plugin that searches for specific content and prints it out.",
+  "description": "Content Decoder",
   "permissions": [
     "clipboardWrite",
     "clipboardRead",
