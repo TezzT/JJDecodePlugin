@@ -1,0 +1,159 @@
+body {
+    width: 300px;
+    font-family: Arial, sans-serif;
+    background-color: #333;
+    color: white;    
+    height: 100%;
+    
+    font-size: 14px;
+}
+
+.allContainer {
+    display: flex
+;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 135px;
+    margin-top: 15px;
+}
+
+.image-container {
+    text-align: center;
+}
+.image-container img {
+    width: 50px;
+    height: auto;
+}
+
+
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    gap: 10PX;
+    background-color: #333;
+    border-radius: 10px;
+    box-shadow: 6px 10px 10px rgba(0, 0, 0, 0.1);
+}
+
+#container1 {
+    margin-bottom: 10px;
+}
+
+.buttons {
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #12121200;
+    color: inherit;
+    border: 1px solid rgb(83, 67, 138);
+    
+
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.buttons:hover{
+    background-color: rgb(83, 67, 138);
+}
+
+.buttons:active{
+    color: rgb(216, 210, 235);
+    background-color: rgb(67, 50, 128);
+}
+
+.line-text {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: white
+}
+
+.line-text::before,
+.line-text::after {
+    content: "";
+    flex: 1;
+    border-bottom: 2px solid white;
+    margin: 5px;
+}
+
+#results {
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 14px;
+    color: #333;
+    border-top: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.spacer{
+    color: white;
+}
+
+
+
+/* Footer */
+footer {
+    font-family: 'Roboto', sans-serif;
+    font-size: 11px;
+    text-align: center;
+    background-color: #222;
+    color: rgb(255, 255, 255);
+    width: 100vw;
+    z-index: 1000;
+    padding: 15px 0 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 6px;
+}
+
+
+.footer-acknowledgement{
+    font-size: 0.9em;
+}
+
+.footer-acknowledgement span {
+    max-width: 70vw;
+    display: inline-block;
+    overflow-wrap: break-word;
+    text-align: center;    
+    line-height: 1.5;
+    padding-top: 2px;
+}
+
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    font-size: 1em;
+    
+}
+
+
+.footer-logo {
+    width: 20px;
+    height: 20px;
+}

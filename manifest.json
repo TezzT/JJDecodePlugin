@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "JJDecoderPlugin",
+  "version": "1.1",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "description": "A plugin that searches for specific content and prints it out.",
+  "permissions": [
+    "clipboardWrite",
+    "clipboardRead",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://static.jjwxc.net/*",
+    "https://my.jjwxc.net/*",
+    "https://tezzt.github.io/html-portfolio/"
+  ],
+  "action": {
+    "default_popup": "web/popup.html"
+  },
+  "background": {
+    "service_worker": "scripts/background.js"
+  }
+}
