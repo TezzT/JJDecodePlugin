@@ -123,7 +123,6 @@ document.getElementById("copyContent").addEventListener("click", async () => {
       updateButtonText(copyContentButton, "Nothing Found");
     }
   } catch (error) {
-    // console.error("Error copying content:", error);
     updateButtonText(copyContentButton, "Content Not Found");
   }
 });
@@ -146,11 +145,24 @@ function findContentAndCopy() {
             return;
           }
 
-          // Handle results
+          // Handle results from primary search
           if (results && results[0] && results[0].result) {
-            resolve(results[0].result); // Return the content
+            resolve(results[0].result); // Return the content from the primary search
           } else {
-            resolve(null); // No content found
+            // If primary content not found, search inside the fallback div
+            chrome.scripting.executeScript(
+              {
+                target: { tabId: activeTab },
+                function: copyFallbackText,
+              },
+              (fallbackResults) => {
+                if (fallbackResults && fallbackResults[0] && fallbackResults[0].result) {
+                  resolve(fallbackResults[0].result); // Return the content from fallback
+                } else {
+                  resolve(null); // No content found
+                }
+              }
+            );
           }
         }
       );
@@ -158,7 +170,8 @@ function findContentAndCopy() {
   });
 }
 
-// Function to extract the text from the div with a random ID (content_...)
+// ==================== PRIMARY SEARCH FUNCTION ====================
+
 function copyContentText() {
   // Get the div with an id starting with content_
   const contentDiv = document.querySelector('div[id^="content_"]');
@@ -169,6 +182,35 @@ function copyContentText() {
     return textContent; // Return the content
   }
   return null; // Return null if no content is found
+}
+
+// ==================== FALLBACK SEARCH FUNCTION ====================
+
+function copyFallbackText() {
+  const className = "novelbody";
+  const elements = document.querySelectorAll(`.${className}`);
+
+  for (let el of elements) {
+    const children = Array.from(el.children);
+    const divChildren = children.filter(child => child.tagName === "DIV");
+
+    if (divChildren.length === 1 && children.length === 1) {
+      const mainDiv = divChildren[0]; // The only direct div
+
+      // Extract text while keeping whitespace (including newlines)
+      let extractedText = "";
+      mainDiv.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          extractedText += node.nodeValue;
+        } else if (node.tagName === "BR") {
+          extractedText += "\n"; // Convert <br> to a line break
+        }
+      });
+
+      return extractedText.trim(); // Return text with line breaks preserved
+    }
+  }
+  return null; // If no valid element found
 }
 
 // ==================== COPY AND SEND FUNCTIONALITY ====================
