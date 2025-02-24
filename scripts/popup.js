@@ -177,13 +177,39 @@ function copyContentText() {
   const contentDiv = document.querySelector('div[id^="content_"]');
 
   if (contentDiv) {
-    // Extract text content, ignoring HTML tags
-    const textContent = contentDiv.innerText || contentDiv.textContent;
-    return textContent; // Return the content
+    let fullText = "";
+
+    // Iterate through child nodes of the contentDiv
+    contentDiv.childNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        fullText += node.textContent; // Keep original spaces and newlines
+      } else if (node.tagName === "SPAN") {
+        // Extract ::before content
+        const beforeStyle = window.getComputedStyle(node, "::before");
+        const beforeText = beforeStyle && beforeStyle.content && beforeStyle.content !== "none" && beforeStyle.content !== '""' 
+          ? beforeStyle.content.replace(/['"]/g, '')  // Remove quotes
+          : "";
+
+        // Extract the text inside <span>
+        const spanText = node.textContent; // Keep spaces and line breaks
+
+        // Extract ::after content
+        const afterStyle = window.getComputedStyle(node, "::after");
+        const afterText = afterStyle && afterStyle.content && afterStyle.content !== "none" && afterStyle.content !== '""' 
+          ? afterStyle.content.replace(/['"]/g, '') 
+          : "";
+
+        // Combine everything in correct order
+        fullText += beforeText + spanText + afterText;
+      } else if (node.tagName === "BR") {
+        fullText += "\n"; // Preserve line breaks
+      }
+    });
+
+    return fullText.trim(); // Return the extracted text
   }
   return null; // Return null if no content is found
 }
-
 // ==================== FALLBACK SEARCH FUNCTION ====================
 
 function copyFallbackText() {
