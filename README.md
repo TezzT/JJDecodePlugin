@@ -1,5 +1,5 @@
 <div align="center">
-   <img src="icons\ICON2.png" alt="JJDecoderPlugin" title="JD" width="100">
+   <img src="https://imgur.com/Elp49Cs.png" alt="JJDecoderPlugin" title="JD" width="100">
    <h1>
       JJDecoderPlugin
    </h1>
