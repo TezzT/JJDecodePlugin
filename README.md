@@ -107,4 +107,3 @@ You can support the project by donating at: [Ko-fi](https://ko-fi.com/anothertez
 
 <br/>
 
-*The decoder is hosted via GitHub Pages, ensuring a secure and static environment. No data is collected, stored, or transmitted.*
