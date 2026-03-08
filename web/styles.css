@@ -9,12 +9,11 @@ body {
 }
 
 .allContainer {
-    display: flex
-;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 135px;
+    margin-bottom: 90px;
     margin-top: 15px;
 }
 
