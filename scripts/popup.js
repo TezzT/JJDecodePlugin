@@ -173,8 +173,22 @@ function findContentAndCopy() {
 // ==================== PRIMARY SEARCH FUNCTION ====================
 
 function copyContentText() {
-  // Get the div with an id starting with content_
-  const contentDiv = document.querySelector('div[id^="content_"]');
+  let contentDiv = document.querySelector('div[id^="content_"]');
+  
+  if (!contentDiv) {
+    contentDiv = document.getElementById('paragraph_comment_content');
+  }
+  
+  if (!contentDiv) {
+    const spans = document.querySelectorAll('.onebook_paragraph_comment_text');
+    if (spans.length > 0) {
+      let text = '';
+      spans.forEach(span => {
+        text += span.textContent + '\n';
+      });
+      return text.trim();
+    }
+  }
 
   if (contentDiv) {
     let fullText = "";
@@ -182,34 +196,48 @@ function copyContentText() {
     // Iterate through child nodes of the contentDiv
     contentDiv.childNodes.forEach(node => {
       if (node.nodeType === Node.TEXT_NODE) {
-        fullText += node.textContent; // Keep original spaces and newlines
-      } else if (node.tagName === "SPAN") {
-        // Extract ::before content
-        const beforeStyle = window.getComputedStyle(node, "::before");
-        const beforeText = beforeStyle && beforeStyle.content && beforeStyle.content !== "none" && beforeStyle.content !== '""' 
-          ? beforeStyle.content.replace(/['"]/g, '')  // Remove quotes
-          : "";
+        fullText += node.textContent;
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.tagName === "BR") {
+          fullText += "\n";
+        } else if (node.tagName === "SPAN") {
+          const beforeStyle = window.getComputedStyle(node, "::before");
+          const beforeText = beforeStyle?.content && 
+                             beforeStyle.content !== "none" && 
+                             beforeStyle.content !== '""' 
+            ? beforeStyle.content.replace(/['"]/g, '') 
+            : "";
 
-        // Extract the text inside <span>
-        const spanText = node.textContent; // Keep spaces and line breaks
+          const spanText = node.textContent || "";
 
-        // Extract ::after content
-        const afterStyle = window.getComputedStyle(node, "::after");
-        const afterText = afterStyle && afterStyle.content && afterStyle.content !== "none" && afterStyle.content !== '""' 
-          ? afterStyle.content.replace(/['"]/g, '') 
-          : "";
+          const afterStyle = window.getComputedStyle(node, "::after");
+          const afterText = afterStyle?.content && 
+                            afterStyle.content !== "none" && 
+                            afterStyle.content !== '""' 
+            ? afterStyle.content.replace(/['"]/g, '') 
+            : "";
 
-        // Combine everything in correct order
-        fullText += beforeText + spanText + afterText;
-      } else if (node.tagName === "BR") {
-        fullText += "\n"; // Preserve line breaks
+          fullText += beforeText + spanText + afterText;
+        } else {
+          fullText += node.textContent || "";
+        }
       }
     });
 
-    return fullText.trim(); // Return the extracted text
+    return fullText.trim();
   }
-  return null; // Return null if no content is found
+  
+  const paragraphSpans = document.querySelectorAll('.onebook_paragraph_comment_text');
+  if (paragraphSpans.length > 0) {
+    return Array.from(paragraphSpans)
+      .map(span => span.textContent.trim())
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n'); 
+  }
+  
+  return null;
 }
+
 // ==================== FALLBACK SEARCH FUNCTION ====================
 
 function copyFallbackText() {
@@ -221,22 +249,26 @@ function copyFallbackText() {
     const divChildren = children.filter(child => child.tagName === "DIV");
 
     if (divChildren.length === 1 && children.length === 1) {
-      const mainDiv = divChildren[0]; // The only direct div
-
-      // Extract text while keeping whitespace (including newlines)
+      const mainDiv = divChildren[0];
       let extractedText = "";
       mainDiv.childNodes.forEach(node => {
         if (node.nodeType === Node.TEXT_NODE) {
           extractedText += node.nodeValue;
         } else if (node.tagName === "BR") {
-          extractedText += "\n"; // Convert <br> to a line break
+          extractedText += "\n";
         }
       });
-
-      return extractedText.trim(); // Return text with line breaks preserved
+      return extractedText.trim();
     }
   }
-  return null; // If no valid element found
+  
+  // Fallback: try noveltext class
+  const noveltextDiv = document.querySelector('.noveltext');
+  if (noveltextDiv) {
+    return noveltextDiv.textContent.trim();
+  }
+  
+  return null;
 }
 
 // ==================== COPY AND SEND FUNCTIONALITY ====================
