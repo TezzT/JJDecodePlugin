@@ -4,6 +4,6 @@
 ### Fixed
 - Added fix for content hidden behind CSS.
 
-## [1.4] - 2025-02-24
+## [1.4] - 2026-05-31
 ### Fixed
 - Added fix for free content copy.
