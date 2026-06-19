@@ -179,60 +179,84 @@ function copyContentText() {
     contentDiv = document.getElementById('paragraph_comment_content');
   }
   
-  if (!contentDiv) {
-    const spans = document.querySelectorAll('.onebook_paragraph_comment_text');
-    if (spans.length > 0) {
-      let text = '';
-      spans.forEach(span => {
-        text += span.textContent + '\n';
-      });
-      return text.trim();
+  // Helper function to extract text including pseudo-elements
+  function extractFullText(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent;
     }
+    
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.tagName === 'BR') {
+        return '\n';
+      }
+      
+      let text = '';
+      
+      // Get ::before content - THIS WORKS FOR ANY ELEMENT!
+      const beforeStyle = window.getComputedStyle(node, '::before');
+      if (beforeStyle && beforeStyle.content) {
+        const content = beforeStyle.content;
+        if (content !== 'none' && content !== 'normal' && content !== '""') {
+          // Clean up the content
+          let cleaned = content.replace(/^["']|["']$/g, '');
+          // Handle Unicode escape sequences (like \e900, \uXXXX)
+          cleaned = cleaned.replace(/\\u([0-9a-fA-F]{4})/gi, (match, hex) => 
+            String.fromCharCode(parseInt(hex, 16))
+          );
+          // Handle CSS escape sequences like \e900 (without 'u')
+          cleaned = cleaned.replace(/\\([0-9a-fA-F]{4})/g, (match, hex) => 
+            String.fromCharCode(parseInt(hex, 16))
+          );
+          // Remove zero-width characters that might be used for anti-scraping
+          cleaned = cleaned.replace(/[\u200B-\u200D\uFEFF]/g, '');
+          text += cleaned;
+        }
+      }
+      
+      // Process all child nodes
+      for (const child of node.childNodes) {
+        text += extractFullText(child);
+      }
+      
+      // Get ::after content
+      const afterStyle = window.getComputedStyle(node, '::after');
+      if (afterStyle && afterStyle.content) {
+        const content = afterStyle.content;
+        if (content !== 'none' && content !== 'normal' && content !== '""') {
+          let cleaned = content.replace(/^["']|["']$/g, '');
+          cleaned = cleaned.replace(/\\u([0-9a-fA-F]{4})/gi, (match, hex) => 
+            String.fromCharCode(parseInt(hex, 16))
+          );
+          cleaned = cleaned.replace(/\\([0-9a-fA-F]{4})/g, (match, hex) => 
+            String.fromCharCode(parseInt(hex, 16))
+          );
+          cleaned = cleaned.replace(/[\u200B-\u200D\uFEFF]/g, '');
+          text += cleaned;
+        }
+      }
+      
+      return text;
+    }
+    
+    return '';
   }
 
   if (contentDiv) {
-    let fullText = "";
-
-    // Iterate through child nodes of the contentDiv
-    contentDiv.childNodes.forEach(node => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        fullText += node.textContent;
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        if (node.tagName === "BR") {
-          fullText += "\n";
-        } else if (node.tagName === "SPAN") {
-          const beforeStyle = window.getComputedStyle(node, "::before");
-          const beforeText = beforeStyle?.content && 
-                             beforeStyle.content !== "none" && 
-                             beforeStyle.content !== '""' 
-            ? beforeStyle.content.replace(/['"]/g, '') 
-            : "";
-
-          const spanText = node.textContent || "";
-
-          const afterStyle = window.getComputedStyle(node, "::after");
-          const afterText = afterStyle?.content && 
-                            afterStyle.content !== "none" && 
-                            afterStyle.content !== '""' 
-            ? afterStyle.content.replace(/['"]/g, '') 
-            : "";
-
-          fullText += beforeText + spanText + afterText;
-        } else {
-          fullText += node.textContent || "";
-        }
-      }
-    });
-
+    let fullText = extractFullText(contentDiv);
+    // Clean up: remove excessive newlines and whitespace
+    fullText = fullText.replace(/\n{3,}/g, '\n\n');
+    fullText = fullText.replace(/[ \t]+/g, ' ');
     return fullText.trim();
   }
   
-  const paragraphSpans = document.querySelectorAll('.onebook_paragraph_comment_text');
-  if (paragraphSpans.length > 0) {
-    return Array.from(paragraphSpans)
-      .map(span => span.textContent.trim())
-      .join('\n')
-      .replace(/\n{3,}/g, '\n\n'); 
+  // Fallback: try .onebook_paragraph_comment_text spans
+  const spans = document.querySelectorAll('.onebook_paragraph_comment_text');
+  if (spans.length > 0) {
+    let fullText = '';
+    spans.forEach(span => {
+      fullText += extractFullText(span);
+    });
+    return fullText.replace(/\n{3,}/g, '\n\n').trim();
   }
   
   return null;
