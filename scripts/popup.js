@@ -186,6 +186,12 @@ function copyContentText() {
     }
     
     if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.classList && node.classList.contains('onebook_paragraph_comment_bubble')) {
+        return ''; 
+      }
+      if (node.classList && node.classList.contains('onebook_paragraph_comment_bubble_mount')) {
+        return ''; 
+      }
       if (node.tagName === 'BR') {
         return '\n';
       }

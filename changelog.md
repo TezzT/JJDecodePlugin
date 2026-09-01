@@ -11,3 +11,7 @@
 ## [1.5] - 2026-06-19
 ### Fixed
 - Added fix for hidden content cant be copied.
+
+## [1.6] - 2026-09-2
+### Fixed
+- Removed comment bubbles being included in copy
